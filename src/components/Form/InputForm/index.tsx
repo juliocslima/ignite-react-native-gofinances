@@ -4,14 +4,15 @@ import { Control, Controller } from 'react-hook-form';
 
 import { Input } from '../Input';
 
-import { Container } from './styles';
+import { Container, Error } from './styles';
 
 interface InputFormProps extends TextInputProps {
   control: Control;
   name: string;
+  error: string;
 }
 
-export function InputForm({ control, name, ...rest }: InputFormProps) {
+export function InputForm({ control, name, error, ...rest }: InputFormProps) {
 
   return (
     <Container>
@@ -26,6 +27,7 @@ export function InputForm({ control, name, ...rest }: InputFormProps) {
         )}
         name={name}
       />
+      { error && <Error>{ error }</Error> }
     </Container>
   );
 }
