@@ -105,8 +105,6 @@ export function Register() {
       });
       navigation.navigate('Listagem');
 
-      console.log(await AsyncStorage.getItem(collectionKey))
-
     } catch (error) {
       console.log(error);
       Alert.alert('Não foi possível salvar a transação.');

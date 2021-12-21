@@ -22,17 +22,73 @@ import {
   Title,
 } from './styles';
 
+interface Summary {
+  deposits: number;
+  withdraws: number;
+  total: number;
+}
+
 const collectionKey = '@gofinance:transaction';
 
 export function Dashboard() {
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [lastTransactionDepositDate, setLastTransactionDepositDate] = useState('');
+  const [lastTransactionWithdrawDate, setLastTransactionWithdrawDate] = useState('');
+  const [summary, setSummary] = useState<Summary>({
+    deposits: 0,
+    withdraws: 0,
+    total: 0
+  });
+
+  function handleDashboarSummary(transactions: Transaction[]) {
+    const resume = transactions.reduce((acc, transaction) => {
+      if (transaction.type === 'income') {
+        acc.deposits += Number(transaction.amount);
+        acc.total += Number(transaction.amount);
+      } else {
+        acc.withdraws -= Number(transaction.amount);
+        acc.total -= Number(transaction.amount);
+      }
+  
+      return acc;
+    }, {
+      deposits: 0,
+      withdraws: 0, 
+      total: 0,
+    });
+
+    setSummary(resume);
+  }
+
+  function getLastTransactionDate(
+    transactions: Transaction[], 
+    type: 'income' | 'outcome'
+  ) {
+    const lastTransactionDate = Math.max.apply(Math, transactions
+      .filter((transaction: Transaction) => transaction.type === type)
+      .map((transaction: Transaction) => new Date(transaction.date). getTime())
+    );
+
+    return Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit', 
+      month: 'long'
+    }).format(new Date(lastTransactionDate));
+  }
 
   async function loadTransactions() {
     const response = await AsyncStorage.getItem(collectionKey);
-    const database = response ? JSON.parse(response) : [];
+    const database: Transaction[] = response ? JSON.parse(response) : [];
 
-    console.log(database);
+    handleDashboarSummary(database);
+
+    setLastTransactionDepositDate(
+      getLastTransactionDate(database, 'income')
+    );
+    
+    setLastTransactionWithdrawDate(
+      getLastTransactionDate(database, 'outcome')
+    );
 
     const transactionsFormatted: Transaction[] = database.map(
       (transaction: Transaction) => {
@@ -63,6 +119,7 @@ export function Dashboard() {
 
   async function handleClearDatabase() {
     await AsyncStorage.removeItem(collectionKey);
+    loadTransactions();
   }
 
   useEffect(() => {
@@ -81,7 +138,7 @@ export function Dashboard() {
             <Photo source={{ uri: 'https://avatars.githubusercontent.com/u/86537737?v=4'}}/>
             <User>
               <UserGretting>Olá</UserGretting>
-              <UserName>Julio Lima</UserName>
+              <UserName>Julia Lima</UserName>
             </User>
           </UserInfo>
 
@@ -95,19 +152,31 @@ export function Dashboard() {
         <Card 
           type="income"
           title="Entradas"
-          amount="R$ 17.400,00"
-          lastTransaction="Última entrada dia 13 de abril"
+          amount={
+            summary.deposits.toLocaleString('pt-BR', { 
+              style: 'currency', currency: 'BRL'}
+            )
+          }
+          lastTransaction={"Última entrada dia " + lastTransactionDepositDate}
         />
         <Card 
           type="outcome"
           title="Saídas"
-          amount="R$ 1.259,00"
-          lastTransaction="Última saída dia 03 de abril"
+          amount={
+            summary.withdraws.toLocaleString('pt-BR', { 
+              style: 'currency', currency: 'BRL'}
+            )
+          }
+          lastTransaction={"Última saída dia " + lastTransactionWithdrawDate}
         />
         <Card 
           type="total"
           title="Total"
-          amount="R$ 16.141,00"
+          amount={
+            summary.total.toLocaleString('pt-BR', { 
+              style: 'currency', currency: 'BRL'}
+            )
+          }
           lastTransaction="01 à 16 de abril"
         />
       </HighlightCards>

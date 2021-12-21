@@ -18,8 +18,8 @@ interface CardProps {
 }
 
 const icon = {
-  income: 'arrow-down-circle',
-  outcome: 'arrow-up-circle',
+  income: 'arrow-up-circle',
+  outcome: 'arrow-down-circle',
   total: 'dollar-sign',
 }
 
