@@ -14,13 +14,17 @@ export const Container = styled(TouchableOpacity)<TransactionTypeButtonsStylePro
   
   padding: 18px;
   border: 1.5px solid ${({ theme, type, isActive }) => 
-    isActive ? type === 'income' ? theme.colors.success_light : theme.colors.attention_light : theme.colors['gray.500']
+    isActive
+    ? type === 'income' ? theme.colors.success_light : theme.colors.attention_light
+    : theme.colors['gray.500']
   };
   border-radius: 5px;
   margin: 8px;
 
   background-color: ${({ theme, type, isActive }) => 
-    isActive ? type === 'income' ? theme.colors.success_light : theme.colors.attention_light : theme.colors.background
+    isActive 
+    ? type === 'income' ? theme.colors.success_light : theme.colors.attention_light 
+    : theme.colors.background
   }
 `;
 

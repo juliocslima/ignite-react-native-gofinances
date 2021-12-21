@@ -9,6 +9,10 @@ export const Container = styled(TouchableOpacity)`
 
 export const ContainerButtons = styled.View`
   flex-direction: row;
+  justify-content: space-between;
+
+  margin-top: 8px;
+  margin-bottom: 16px;
 `;
 
 export const Header = styled.View`
