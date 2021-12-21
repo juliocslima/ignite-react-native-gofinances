@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+
 import { Card } from '../../components/Card';
 import { TransactionCard } from '../../components/TransactionCard';
+import { Transaction } from '../../components/TransactionCard';
 import { 
   Container, 
   Header,
@@ -12,65 +16,62 @@ import {
   UserGretting,
   UserName,
   Icon,
+  LogoutButton,
   Transactions,
   TransactionList,
   Title,
 } from './styles';
 
-import { Transaction } from '../../components/TransactionCard';
-
-export interface TransactionListData extends Transaction {
-  id: string;
-}
+const collectionKey = '@gofinance:transaction';
 
 export function Dashboard() {
 
-  const transactions: TransactionListData[] = [
-    {
-      id: '1',
-      title:"Desenvolvimento de site",
-      amount:"R$ 12.000,00",
-      type:"income",
-      date:"13/04/2020",
-      category:{
-        name: 'Vendas',
-        icon: 'dollar-sign'
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+
+  async function loadTransactions() {
+    const response = await AsyncStorage.getItem(collectionKey);
+    const database = response ? JSON.parse(response) : [];
+
+    console.log(database);
+
+    const transactionsFormatted: Transaction[] = database.map(
+      (transaction: Transaction) => {
+        const amount = Number(transaction.amount)
+          .toLocaleString('pt-BR', { 
+            style: 'currency', currency: 'BRL'}
+          );
+
+        const dateFormatted = Intl.DateTimeFormat('pt-BR', {
+          day: '2-digit', 
+          month: '2-digit', 
+          year: 'numeric'
+        }).format(new Date(transaction.date));
+
+        return {
+          id: transaction.id,
+          name: transaction.name,
+          amount,
+          type: transaction.type,
+          category: transaction.category,
+          date: dateFormatted,
+        }
       }
-    },
-    {
-      id: '2',
-      title:"Hamburgueria Pizzy",
-      amount:"R$ 59,00",
-      type:"outcome",
-      date:"10/04/2020",
-      category:{
-        name: 'Alimentação',
-        icon: 'coffee'
-      }
-    },
-    {
-      id: '3',
-      title:"Aluguel do apartamento",
-      amount:"R$ 1.200,00",
-      type:"outcome",
-      date:"15/04/2020",
-      category:{
-        name: 'Aluguel',
-        icon: 'shopping-bag'
-      }
-    },
-    {
-      id: '4',
-      title:"Hamburgueria Pizzy",
-      amount:"R$ 59,00",
-      type:"outcome",
-      date:"10/04/2020",
-      category:{
-        name: 'Alimentação',
-        icon: 'coffee'
-      }
-    },
-  ]
+    )
+
+    setTransactions(transactionsFormatted);
+  }
+
+  async function handleClearDatabase() {
+    await AsyncStorage.removeItem(collectionKey);
+  }
+
+  useEffect(() => {
+    loadTransactions();
+  }, []);
+
+  useFocusEffect(useCallback(() => {
+    loadTransactions();
+  }, []));
 
   return(
     <Container>
@@ -84,7 +85,9 @@ export function Dashboard() {
             </User>
           </UserInfo>
 
-          <Icon name="power"/>
+          <LogoutButton onPress={handleClearDatabase}>
+            <Icon name="power"/>
+          </LogoutButton>
         </UserContainer>
       </Header>
 

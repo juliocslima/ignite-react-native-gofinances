@@ -1,10 +1,10 @@
 import styled from 'styled-components/native';
-import { FlatList } from 'react-native';
+import { FlatList, TouchableOpacity } from 'react-native';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import { Feather } from '@expo/vector-icons';
 import { getStatusBarHeight, getBottomSpace } from 'react-native-iphone-x-helper';
 
-import { TransactionListData } from '.';
+import { Transaction } from '../../components/TransactionCard';
 
 export const Container = styled.View`
   flex: 1;
@@ -78,6 +78,8 @@ export const Icon = styled(Feather)`
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
+export const LogoutButton = styled(TouchableOpacity)``;
+
 export const Transactions = styled.View`
   flex: 1;
   padding: 0 24px;
@@ -91,7 +93,7 @@ export const Title = styled.Text`
 `;
 
 export const TransactionList = styled(
-  FlatList as new () => FlatList<TransactionListData>
+  FlatList as new () => FlatList<Transaction>
 ).attrs({
   showsVerticalScrollIndicator: false,
   contentContainerStyle: { 

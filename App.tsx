@@ -2,6 +2,8 @@ import React from 'react';
 import AppLoading from 'expo-app-loading';
 import { ThemeProvider } from 'styled-components/native';
 import { NavigationContainer } from '@react-navigation/native';
+import 'intl';
+import 'intl/locale-data/jsonp/pt-BR';
 
 import {
   useFonts,

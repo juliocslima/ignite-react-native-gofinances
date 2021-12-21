@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import uuid from 'react-native-uuid';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigation } from '@react-navigation/native'
 
 import { Button } from '../../components/Form/Button';
 import { CategorySelectButton } from '../../components/Form/CategorySelectButton';
@@ -24,6 +27,8 @@ interface FormData {
   amount: number;
 }
 
+const collectionKey = '@gofinance:transaction';
+
 const schema = yup.object({
   name: yup
     .string()
@@ -39,12 +44,14 @@ const schema = yup.object({
 export function Register() {
   const [transactionType, setTransactionType] = useState('');
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const navigation = useNavigation();
+
   const [category, setCategory] = useState({
     key: 'category',
     name: 'Categoria'
   });
 
-  const { control, handleSubmit, formState: { errors }  } = useForm({
+  const { control, handleSubmit, reset, formState: { errors }  } = useForm({
     resolver: yupResolver(schema)
   });
 
@@ -61,7 +68,7 @@ export function Register() {
     setCategoryModalOpen(false);
   }
 
-  function handleSendTransaction(form: FormData) {
+  async function handleSendTransaction(form: FormData) {
     if(!transactionType) {
       Alert.alert("Selecione o tipo de transação.");
     }
@@ -70,21 +77,40 @@ export function Register() {
       Alert.alert("Selecione a categoria da transação.");
     }
 
-    let newAmount = form.amount.toString();
-    newAmount = newAmount.replace(',', '.')
-
-    if(errors) {
-      console.log
-    }
-
-    const data = {
+    const newTransaction = {
+      id: String(uuid.v4()),
       name: form.name,
-      amount: Number(newAmount),
-      transactionType,
-      category: category.key
+      amount: Number(form.amount),
+      type: transactionType,
+      category: category.key,
+      date: new Date()
     }
 
-    console.log(data);
+    try {
+      const database = await AsyncStorage.getItem(collectionKey);
+      const currentDatabase = database ? JSON.parse(database) : [];
+
+      const transactions = [
+        ...currentDatabase,
+        newTransaction
+      ];
+
+      await AsyncStorage.setItem(collectionKey, JSON.stringify(transactions));
+
+      reset();
+      setTransactionType('');
+      setCategory({
+        key: 'category',
+        name: 'Categoria'
+      });
+      navigation.navigate('Listagem');
+
+      console.log(await AsyncStorage.getItem(collectionKey))
+
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Não foi possível salvar a transação.');
+    }
   }
 
   return(
