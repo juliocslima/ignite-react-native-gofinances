@@ -4,7 +4,8 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import { Card } from '../../components/Card';
 import { TransactionCard } from '../../components/TransactionCard';
-import { Transaction } from '../../components/TransactionCard';
+import { Transaction } from '../../entities/Transaction';
+
 import { 
   Container, 
   Header,
@@ -80,15 +81,22 @@ export function Dashboard() {
     const response = await AsyncStorage.getItem(collectionKey);
     const database: Transaction[] = response ? JSON.parse(response) : [];
 
-    handleDashboarSummary(database);
+    console.log(database);
 
-    setLastTransactionDepositDate(
-      getLastTransactionDate(database, 'income')
-    );
+    try {
+      handleDashboarSummary(database);
+
+      setLastTransactionDepositDate(
+        getLastTransactionDate(database, 'income')
+      );
+      
+      setLastTransactionWithdrawDate(
+        getLastTransactionDate(database, 'outcome')
+      );
+    } catch(error) {
+      console.log(error);
+    }
     
-    setLastTransactionWithdrawDate(
-      getLastTransactionDate(database, 'outcome')
-    );
 
     const transactionsFormatted: Transaction[] = database.map(
       (transaction: Transaction) => {

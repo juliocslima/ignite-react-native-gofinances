@@ -22,6 +22,8 @@ import {
   Title,
 } from './styles';
 
+import { Transaction } from '../../entities/Transaction';
+
 interface FormData {
   name: string;
   amount: number;
@@ -42,7 +44,7 @@ const schema = yup.object({
 }).required();
 
 export function Register() {
-  const [transactionType, setTransactionType] = useState('');
+  const [transactionType, setTransactionType] = useState<'income' | 'outcome'>('');
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const navigation = useNavigation();
 
@@ -77,23 +79,29 @@ export function Register() {
       Alert.alert("Selecione a categoria da transação.");
     }
 
-    const newTransaction = {
+    const newTransaction: Transaction = {
       id: String(uuid.v4()),
       name: form.name,
-      amount: Number(form.amount),
+      amount: String(form.amount),
       type: transactionType,
       category: category.key,
-      date: new Date()
+      date: String(new Date())
     }
 
     try {
       const database = await AsyncStorage.getItem(collectionKey);
-      const currentDatabase = database ? JSON.parse(database) : [];
+      const currentDatabase: Transaction[] = database ? JSON.parse(database) : [];
+      
+      let transactions: Transaction[] = [];
 
-      const transactions = [
-        ...currentDatabase,
-        newTransaction
-      ];
+      currentDatabase.length > 0 ?  (
+        transactions = [
+          ...currentDatabase,
+          newTransaction
+        ]
+      ): (
+        transactions.push(newTransaction)
+      )
 
       await AsyncStorage.setItem(collectionKey, JSON.stringify(transactions));
 

@@ -12,14 +12,7 @@ import {
   TransactionDate,
 } from './styles';
 
-export interface Transaction {
-  id: string;
-  name: string;
-  amount: string;
-  type: 'income' | 'outcome';
-  date: string;
-  category: string;
-}
+import { Transaction } from '../../entities/Transaction';
 
 interface TransactionCardProps {
   data: Transaction;
