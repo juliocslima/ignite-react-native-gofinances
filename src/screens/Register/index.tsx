@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Alert, TouchableWithoutFeedback } from 'react-native';
+import { Modal, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -49,6 +49,7 @@ export function Register() {
   });
 
   function handleTransactionTypeSelect(type: 'income' | 'outcome') {
+    Keyboard.dismiss();
     setTransactionType(type);
   }
 
@@ -88,7 +89,7 @@ export function Register() {
 
   return(
     <TouchableWithoutFeedback onPress={() => Alert.alert('Pressed!')}>
-    <Container>
+    <Container onPress={Keyboard.dismiss}>
       <Header>
         <Title>Cadastro</Title>
       </Header>

@@ -2,9 +2,12 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native'
 
-export const Container = styled(TouchableOpacity)`
+export const Container = styled(TouchableOpacity).attrs({
+  activeOpacity: 1,
+})`
   flex: 1;
   background-color: ${({ theme }) => theme.colors.background};
+  
 `;
 
 export const ContainerButtons = styled.View`
