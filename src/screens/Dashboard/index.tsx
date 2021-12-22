@@ -1,10 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useTheme } from "styled-components";
 
 import { Card } from '../../components/Card';
 import { TransactionCard } from '../../components/TransactionCard';
 import { Transaction } from '../../entities/Transaction';
+import { CalendarSelectButton } from '../../components/Form/CalendarSelectButton';
 
 import { 
   Container, 
@@ -17,11 +21,15 @@ import {
   UserGretting,
   UserName,
   Icon,
+  LoadContainer,
   LogoutButton,
   Transactions,
   TransactionList,
+  TransactionsListTitle,
   Title,
 } from './styles';
+import { Button } from '../../components/Form/Button';
+import { Message } from '../../components/Message';
 
 interface Summary {
   deposits: number;
@@ -32,7 +40,8 @@ interface Summary {
 const collectionKey = '@gofinance:transaction';
 
 export function Dashboard() {
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [showData, setShowData] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [lastTransactionDepositDate, setLastTransactionDepositDate] = useState('');
   const [lastTransactionWithdrawDate, setLastTransactionWithdrawDate] = useState('');
@@ -40,7 +49,13 @@ export function Dashboard() {
     deposits: 0,
     withdraws: 0,
     total: 0
-  });
+  });  
+
+  const [date, setDate] = useState(new Date());
+  const [mode, setMode] = useState('date');
+  const [show, setShow] = useState(false);
+
+  const theme = useTheme();
 
   function handleDashboarSummary(transactions: Transaction[]) {
     const resume = transactions.reduce((acc, transaction) => {
@@ -58,6 +73,12 @@ export function Dashboard() {
       withdraws: 0, 
       total: 0,
     });
+
+    if(resume.total === 0) {
+      setShowData(false);
+    } else  {
+      setShowData(true);
+    }
 
     setSummary(resume);
   }
@@ -78,25 +99,37 @@ export function Dashboard() {
   }
 
   async function loadTransactions() {
+
+    setIsLoading(true);
+
     const response = await AsyncStorage.getItem(collectionKey);
     const database: Transaction[] = response ? JSON.parse(response) : [];
 
+    const transactionsFiltered: Transaction[] = database.filter( transaction =>
+      new Date(transaction.date).getFullYear() === date.getFullYear() &&
+      new Date(transaction.date).getMonth() === date.getMonth() &&
+      new Date(transaction.date).getDay() >= 1 &&
+      new Date(transaction.date).getDay() <= date.getDay()
+    )
+
     try {
-      handleDashboarSummary(database);
+      handleDashboarSummary(transactionsFiltered);
 
       setLastTransactionDepositDate(
-        getLastTransactionDate(database, 'income')
+        getLastTransactionDate(transactionsFiltered, 'income')
       );
       
       setLastTransactionWithdrawDate(
-        getLastTransactionDate(database, 'outcome')
+        getLastTransactionDate(transactionsFiltered, 'outcome')
       );
     } catch(error) {
       console.log(error);
-    }
-    
 
-    const transactionsFormatted: Transaction[] = database.map(
+    }
+
+    console.log(database);
+
+    const transactionsFormatted: Transaction[] = transactionsFiltered.map(
       (transaction: Transaction) => {
         const amount = Number(transaction.amount)
           .toLocaleString('pt-BR', { 
@@ -118,9 +151,10 @@ export function Dashboard() {
           date: dateFormatted,
         }
       }
-    )
+    );
 
     setTransactions(transactionsFormatted);
+    setIsLoading(false);
   }
 
   async function handleClearDatabase() {
@@ -128,9 +162,30 @@ export function Dashboard() {
     loadTransactions();
   }
 
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShow(Platform.OS === 'ios');
+    setDate(currentDate);
+
+    console.log(selectedDate);
+  };
+
+  const showMode = (currentMode: 'date' | 'datetime' | 'time') => {
+    setShow(true);
+    setMode(currentMode);
+  };
+
+  const toggleDatepicker = () => {
+    if(show) {
+      setShow(false);
+    } else {
+      showMode('date');
+    }
+  }
+
   useEffect(() => {
     loadTransactions();
-  }, []);
+  }, [date]);
 
   useFocusEffect(useCallback(() => {
     loadTransactions();
@@ -154,49 +209,99 @@ export function Dashboard() {
         </UserContainer>
       </Header>
 
-      <HighlightCards>
-        <Card 
-          type="income"
-          title="Entradas"
-          amount={
-            summary.deposits.toLocaleString('pt-BR', { 
-              style: 'currency', currency: 'BRL'}
-            )
-          }
-          lastTransaction={"Última entrada dia " + lastTransactionDepositDate}
-        />
-        <Card 
-          type="outcome"
-          title="Saídas"
-          amount={
-            summary.withdraws.toLocaleString('pt-BR', { 
-              style: 'currency', currency: 'BRL'}
-            )
-          }
-          lastTransaction={"Última saída dia " + lastTransactionWithdrawDate}
-        />
-        <Card 
-          type="total"
-          title="Total"
-          amount={
-            summary.total.toLocaleString('pt-BR', { 
-              style: 'currency', currency: 'BRL'}
-            )
-          }
-          lastTransaction="01 à 16 de abril"
-        />
-      </HighlightCards>
+      { isLoading ? (
+          <LoadContainer>
+            <ActivityIndicator
+              color={theme.colors.primary}
+              size="large"
+            />
+          </LoadContainer>
+         ) : (
+          <>
 
-      <Transactions>
-        <Title>Listagem</Title>
+          <HighlightCards>
+            <Card 
+              type="income"
+              title="Entradas"
+              amount={
+                summary.deposits.toLocaleString('pt-BR', { 
+                  style: 'currency', currency: 'BRL'}
+                )
+              }
+              lastTransaction={showData ? `Última entrada dia ${lastTransactionDepositDate}` : ''}
+            />
+            <Card 
+              type="outcome"
+              title="Saídas"
+              amount={
+                summary.withdraws.toLocaleString('pt-BR', { 
+                  style: 'currency', currency: 'BRL'}
+                )
+              }
+              lastTransaction={showData ? `Última saída dia ${lastTransactionWithdrawDate}` : ''}
+            />
+            <Card 
+              type="total"
+              title="Total"
+              amount={
+                summary.total.toLocaleString('pt-BR', { 
+                  style: 'currency', currency: 'BRL'}
+                )
+              }
+              lastTransaction={`01 à ${
+                  Intl.DateTimeFormat('pt-BR', {
+                    day: '2-digit',
+                    month: 'long'
+                  }).format(date)
+                }`}
+            />
+          </HighlightCards>
 
-        <TransactionList 
-          data={transactions}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => <TransactionCard data={item}/>}
-        />
-        
-      </Transactions>
+          
+          <Transactions>
+            <TransactionsListTitle>
+              <Title>Listagem</Title>
+              <CalendarSelectButton 
+                title={
+                  Intl.DateTimeFormat('pt-BR', {
+                    month: 'long',
+                    year: 'numeric'
+                  }).format(date)
+                }
+                onPress={toggleDatepicker} 
+              />
+            </TransactionsListTitle>
+
+            {show && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date}
+                mode={mode}
+                is24Hour={true}
+                display="default"
+                onChange={onChange}
+              />
+            )}
+
+            { showData ? (
+              <TransactionList 
+                data={transactions}
+                keyExtractor={item => item.id}
+                renderItem={({ item }) => <TransactionCard data={item}/>}
+              />
+            ) : (
+              <Message 
+                icon="x-octagon" 
+                firstMessage="Não existem lançamentos" 
+                secondMessage="para o período informado"
+              />
+            ) }
+        </Transactions>
+            
+          
+        </>
+        )
+      }
     </Container>
   );
 }

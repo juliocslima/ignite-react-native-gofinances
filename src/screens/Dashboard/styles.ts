@@ -13,7 +13,7 @@ export const Container = styled.View`
 
 export const Header = styled.View`
   width: 100%;
-  height: ${RFPercentage(42)}px;
+  height: ${RFPercentage(32)}px;
 
   background-color: ${({ theme }) => theme.colors.primary }
 
@@ -87,11 +87,6 @@ export const Transactions = styled.View`
   margin-top: ${RFPercentage(12)}px;
 `;
 
-export const Title = styled.Text`
-  font-size: ${RFValue(18)}px;
-  font-family: ${({ theme }) => theme.fonts.regular};
-`;
-
 export const TransactionList = styled(
   FlatList as new () => FlatList<Transaction>
 ).attrs({
@@ -100,3 +95,24 @@ export const TransactionList = styled(
     paddingBottom: getBottomSpace() 
   },
 })``;
+
+export const TransactionsListTitle = styled.View`
+  width: 100%;
+
+  flex-direction: row;
+  margin-bottom: 5px;;
+  
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const Title = styled.Text`
+  font-size: ${RFValue(18)}px;
+  font-family: ${({ theme }) => theme.fonts.regular};
+`;
+
+export const LoadContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;

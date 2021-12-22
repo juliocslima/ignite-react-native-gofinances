@@ -19,7 +19,7 @@ export const Footer = styled.View`
   flex-direction: row;
   justify-content: space-between;
 
-  margin-top: 19px;
+  margin-top: 10px;
   align-items: center;
 `;
 

@@ -9,6 +9,34 @@ podfile_properties = JSON.parse(File.read('./Podfile.properties.json')) rescue {
 
 target 'gofinances' do
   use_expo_modules!
+  
+  # As we use Swift, ensure that `use_frameworks` is enabled.
+  use_frameworks!
+
+  # Specific iOS platform we are targetting
+  platform :ios, '8.0'
+
+  # Point to the installed version
+  pod 'RNDateTimePicker', :path => '../node_modules/@react-native-community/datetimepicker/RNDateTimePicker.podspec'
+
+  # React/React-Native specific pods
+  pod 'React', :path => '../node_modules/react-native', :subspecs => [
+    'Core',
+    'CxxBridge',      # Include this for RN >= 0.47
+    'DevSupport',     # Include this to enable In-App Devmenu if RN >= 0.43
+    'RCTText',
+    'RCTNetwork',
+    'RCTWebSocket',   # Needed for debugging
+  ]
+
+  # Explicitly include Yoga if you are using RN >= 0.42.0
+  pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
+
+  # Third party deps podspec link
+  pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
+  pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
+  pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
+
   config = use_native_modules!
 
   use_react_native!(

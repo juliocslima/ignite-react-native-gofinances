@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { ActivityIndicator, Alert } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -7,6 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { VictoryPie } from 'victory-native';
 import { useTheme } from "styled-components";
 import { addMonths, subMonths } from 'date-fns';
+
+import { Message } from '../../components/Message';
 
 import {
   Container,
@@ -19,9 +21,6 @@ import {
   MonthSelectButton,
   MonthSelectIcon,
   LoadContainer,
-  Message,
-  MessageContent,
-  MessageIcon,
 } from './styles'
 
 import { COLLECTION_KEY, CATEGORIES } from '../../global/constants'
@@ -106,6 +105,8 @@ export function Resume() {
       setShowData(false);
     }
 
+    console.log(resumeGraph);
+
     setResume(resumeGraph);
   }
 
@@ -134,6 +135,7 @@ export function Resume() {
       });
 
       handleResume(resumeData);
+
       setIsLoading(false);
 
     } catch (error) {
@@ -143,13 +145,9 @@ export function Resume() {
     }
   }
 
-  useEffect(() => {
-    loadData();
-  }, [selectedDate])
-
   useFocusEffect(useCallback(() => {
     loadData();
-  }, []));
+  }, [selectedDate]));
 
   return(
     <Container>
@@ -226,22 +224,15 @@ export function Resume() {
               </ContentResume>
               </>
             ) : (
-              <MessageContent>
-                <MessageIcon name="x-octagon" />
-                <Message>
-                  Não existem lançamentos
-                </Message>
-                <Message>
-                  para o mês selecionado
-                </Message>
-              </MessageContent>
+              <Message 
+                icon="x-octagon" 
+                firstMessage="Não existem lançamentos" 
+                secondMessage="para o período informado"
+              />
             ) }
           </>
         )
       }
-
-      
-      
     </Container>
   );
 }

@@ -12,7 +12,7 @@ export const Container = styled.View<CardProps>`
   };
 
   width: ${RFValue(300)}px;
-  height: ${RFValue(200)}px;
+  height: ${RFValue(150)}px;
 
   border-radius: 5px;
   padding: 19px 23px;
@@ -51,7 +51,7 @@ export const Icon = styled(Feather)<CardProps>`
 `;
 
 export const Content = styled.View`
-  margin-top: 35px;
+  margin-top: 15px;
 `;
 
 export const Amount = styled.Text<CardProps>`
