@@ -81,8 +81,6 @@ export function Dashboard() {
     const response = await AsyncStorage.getItem(collectionKey);
     const database: Transaction[] = response ? JSON.parse(response) : [];
 
-    console.log(database);
-
     try {
       handleDashboarSummary(database);
 
@@ -146,7 +144,7 @@ export function Dashboard() {
             <Photo source={{ uri: 'https://avatars.githubusercontent.com/u/86537737?v=4'}}/>
             <User>
               <UserGretting>Olá</UserGretting>
-              <UserName>Julia Lima</UserName>
+              <UserName>Julio Lima</UserName>
             </User>
           </UserInfo>
 

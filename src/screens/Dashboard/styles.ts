@@ -4,7 +4,7 @@ import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import { Feather } from '@expo/vector-icons';
 import { getStatusBarHeight, getBottomSpace } from 'react-native-iphone-x-helper';
 
-import { Transaction } from '../../components/TransactionCard';
+import { Transaction } from '../../entities/Transaction';
 
 export const Container = styled.View`
   flex: 1;
