@@ -39,6 +39,7 @@ interface Summary {
 
 import { COLLECTION_KEY } from '../../global/constants';
 import { useAuth } from '../../hooks/auth';
+import { Avatar } from '../../components/Avatar';
 
 export function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
@@ -196,7 +197,7 @@ export function Dashboard() {
       <Header>
         <UserContainer>
           <UserInfo>
-            <Photo source={{ uri: 'https://avatars.githubusercontent.com/u/86537737?v=4'}}/>
+            <Avatar name={user.name} photo={user.photo} />
             <User>
               <UserGretting>Olá</UserGretting>
               <UserName>{user.name}</UserName>
