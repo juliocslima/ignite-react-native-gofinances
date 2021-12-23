@@ -1,5 +1,5 @@
 import React from 'react';
-import { categories } from '../../utils/categories';
+import { CATEGORIES } from '../../global/constants';
 
 import { 
   Container,
@@ -19,7 +19,7 @@ interface TransactionCardProps {
 }
 
 export function TransactionCard({ data }: TransactionCardProps) {
-    const [ category ] = categories.filter(
+    const [ category ] = CATEGORIES.filter(
       item => item.key === data.category
     );
 

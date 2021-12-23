@@ -38,6 +38,7 @@ interface Summary {
 }
 
 import { COLLECTION_KEY } from '../../global/constants';
+import { useAuth } from '../../hooks/auth';
 
 export function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
@@ -56,6 +57,7 @@ export function Dashboard() {
   const [show, setShow] = useState(false);
 
   const theme = useTheme();
+  const { user } = useAuth();
 
   function handleDashboarSummary(transactions: Transaction[]) {
     const resume = transactions.reduce((acc, transaction) => {
@@ -101,7 +103,6 @@ export function Dashboard() {
   async function loadTransactions() {
 
     setIsLoading(true);
-    console.log(date);
 
     const response = await AsyncStorage.getItem(COLLECTION_KEY);
     const database: Transaction[] = response ? JSON.parse(response) : [];
@@ -125,7 +126,6 @@ export function Dashboard() {
       );
     } catch(error) {
       console.log(error);
-
     }
 
     const transactionsFormatted: Transaction[] = transactionsFiltered.map(
@@ -157,7 +157,8 @@ export function Dashboard() {
   }
 
   async function handleClearDatabase() {
-    await AsyncStorage.removeItem(COLLECTION_KEY);
+    await AsyncStorage.removeItem('@gofinance:transaction');
+    await AsyncStorage.removeItem('@gofinance:user');
     loadTransactions();
   }
 
@@ -182,13 +183,9 @@ export function Dashboard() {
     }
   }
 
-  useEffect(() => {
-    loadTransactions();
-  }, [date]);
-
   useFocusEffect(useCallback(() => {
     loadTransactions();
-  }, []));
+  }, [date]));
 
   return(
     <Container>
@@ -198,7 +195,7 @@ export function Dashboard() {
             <Photo source={{ uri: 'https://avatars.githubusercontent.com/u/86537737?v=4'}}/>
             <User>
               <UserGretting>Olá</UserGretting>
-              <UserName>Julio Lima</UserName>
+              <UserName>{user.name}</UserName>
             </User>
           </UserInfo>
 

@@ -14,7 +14,7 @@ import {
 
 import { Button } from '../../components/Form/Button';
 
-import { categories } from '../../utils/categories';
+import { CATEGORIES } from '../../global/constants';
 
 export type Category = {
   key: string,
@@ -44,7 +44,7 @@ export function CategorySelect({
       </Header>
 
       <FlatList 
-        data={categories}
+        data={CATEGORIES}
         style={{ flex: 1, width: '100%' }}
         keyExtractor={(item) => item.key}
         renderItem={({item}) => (
