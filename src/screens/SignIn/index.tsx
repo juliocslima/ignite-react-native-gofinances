@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Alert } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -21,13 +21,16 @@ import {
 } from './styles';
 
 export function SignIn() {
-
+  const [isLoading, setIsLoading] = useState(false);
   const { signInWithGoogle, signInWithApple } = useAuth();
   
   async function handleSignInWithGoogle() {
     try {
+      setIsLoading(true);
       await signInWithGoogle();
+      setIsLoading(false);
     } catch(err) {
+      setIsLoading(false);
       console.log(err);
       Alert.alert('Não foi possível conectar com a conta Google');
     }
@@ -35,8 +38,11 @@ export function SignIn() {
 
   async function handleSignInWithApple() {
     try {
+      setIsLoading(true);
       await signInWithApple();
+      setIsLoading(false);
     } catch(err) {
+      setIsLoading(false);
       console.log(err);
       Alert.alert('Não foi possível conectar com a conta Apple');
     }

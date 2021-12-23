@@ -57,7 +57,7 @@ export function Dashboard() {
   const [show, setShow] = useState(false);
 
   const theme = useTheme();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   function handleDashboarSummary(transactions: Transaction[]) {
     const resume = transactions.reduce((acc, transaction) => {
@@ -199,7 +199,7 @@ export function Dashboard() {
             </User>
           </UserInfo>
 
-          <LogoutButton onPress={handleClearDatabase}>
+          <LogoutButton onPress={signOut}>
             <Icon name="power"/>
           </LogoutButton>
         </UserContainer>

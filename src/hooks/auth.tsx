@@ -35,6 +35,7 @@ interface IAuthContextData {
   user: User;
   signInWithGoogle: () => Promise<void>;
   signInWithApple: () => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext({} as IAuthContextData);
@@ -121,6 +122,11 @@ function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+  async function signOut() {
+    setUser({} as User);
+    await AsyncStorage.removeItem('@gofinance:user');
+  }
+
   useEffect(() => {
     loadUserStorageData();
   }, [])
@@ -130,6 +136,7 @@ function AuthProvider({ children }: AuthProviderProps) {
       user,
       signInWithGoogle,
       signInWithApple,
+      signOut,
     }}>
       {children}
     </AuthContext.Provider>
