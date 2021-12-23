@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -106,6 +106,10 @@ export function Dashboard() {
 
     const response = await AsyncStorage.getItem(COLLECTION_KEY);
     const database: Transaction[] = response ? JSON.parse(response) : [];
+
+    if(database.length === 0) {
+      console.log('Banco de dados vazio');
+    };
 
     const transactionsFiltered: Transaction[] = database.filter( transaction =>
       new Date(transaction.date).getFullYear() === date.getFullYear() &&
