@@ -24,7 +24,7 @@ import {
 } from './styles'
 
 import { COLLECTION_KEY, CATEGORIES } from '../../global/constants'
-import { Transaction } from "../../entities/Transaction";
+import { Transaction } from "../../@types/entities/Transaction";
 
 interface ResumeItem {
   key: string;

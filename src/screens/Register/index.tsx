@@ -22,14 +22,14 @@ import {
   Title,
 } from './styles';
 
-import { Transaction } from '../../entities/Transaction';
+import { Transaction } from '../../@types/entities/Transaction';
 
 interface FormData {
   name: string;
   amount: number;
 }
 
-const collectionKey = '@gofinance:transaction';
+import { COLLECTION_KEY } from '../../global/constants';
 
 const schema = yup.object({
   name: yup
@@ -89,7 +89,7 @@ export function Register() {
     }
 
     try {
-      const database = await AsyncStorage.getItem(collectionKey);
+      const database = await AsyncStorage.getItem(COLLECTION_KEY);
       const currentDatabase: Transaction[] = database ? JSON.parse(database) : [];
       
       let transactions: Transaction[] = [];
@@ -103,7 +103,7 @@ export function Register() {
         transactions.push(newTransaction)
       )
 
-      await AsyncStorage.setItem(collectionKey, JSON.stringify(transactions));
+      await AsyncStorage.setItem(COLLECTION_KEY, JSON.stringify(transactions));
 
       reset();
       setTransactionType('');

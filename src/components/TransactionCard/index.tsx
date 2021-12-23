@@ -12,7 +12,7 @@ import {
   TransactionDate,
 } from './styles';
 
-import { Transaction } from '../../entities/Transaction';
+import { Transaction } from '../../@types/entities/Transaction';
 
 interface TransactionCardProps {
   data: Transaction;

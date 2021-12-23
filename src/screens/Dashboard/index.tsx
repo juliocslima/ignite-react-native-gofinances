@@ -7,7 +7,7 @@ import { useTheme } from "styled-components";
 
 import { Card } from '../../components/Card';
 import { TransactionCard } from '../../components/TransactionCard';
-import { Transaction } from '../../entities/Transaction';
+import { Transaction } from '../../@types/entities/Transaction';
 import { CalendarSelectButton } from '../../components/Form/CalendarSelectButton';
 
 import { 
@@ -28,7 +28,7 @@ import {
   TransactionsListTitle,
   Title,
 } from './styles';
-import { Button } from '../../components/Form/Button';
+
 import { Message } from '../../components/Message';
 
 interface Summary {
@@ -37,7 +37,7 @@ interface Summary {
   total: number;
 }
 
-const collectionKey = '@gofinance:transaction';
+import { COLLECTION_KEY } from '../../global/constants';
 
 export function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
@@ -101,8 +101,9 @@ export function Dashboard() {
   async function loadTransactions() {
 
     setIsLoading(true);
+    console.log(date);
 
-    const response = await AsyncStorage.getItem(collectionKey);
+    const response = await AsyncStorage.getItem(COLLECTION_KEY);
     const database: Transaction[] = response ? JSON.parse(response) : [];
 
     const transactionsFiltered: Transaction[] = database.filter( transaction =>
@@ -126,8 +127,6 @@ export function Dashboard() {
       console.log(error);
 
     }
-
-    console.log(database);
 
     const transactionsFormatted: Transaction[] = transactionsFiltered.map(
       (transaction: Transaction) => {
@@ -158,7 +157,7 @@ export function Dashboard() {
   }
 
   async function handleClearDatabase() {
-    await AsyncStorage.removeItem(collectionKey);
+    await AsyncStorage.removeItem(COLLECTION_KEY);
     loadTransactions();
   }
 
