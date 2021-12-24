@@ -1,5 +1,3 @@
-export const COLLECTION_KEY = '@gofinance:transaction';
-
 export const CATEGORIES = [
   { key: 'purchases', name: 'Compras', icon: 'shopping-bag', color: '#5636D3' },
   { key: 'food', name: 'Alimentação', icon: 'coffee', color: '#FF872C' },
