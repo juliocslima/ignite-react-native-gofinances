@@ -17,7 +17,7 @@ export function Avatar({ name, photo }: AvatarProps){
     const allNames = fullname.trim().split(' ');
 
     if(allNames.length === 1) {
-      return allNames[0].substring(0, 2).toUpperCase();
+      return allNames[0].substring(0, 1).toUpperCase();
     } else {
       const initials = allNames.reduce((acc, curr, index) => {
         if(index === 0 || index === allNames.length - 1){

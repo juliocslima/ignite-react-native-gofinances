@@ -105,7 +105,8 @@ export function Dashboard() {
 
     setIsLoading(true);
 
-    const response = await AsyncStorage.getItem(COLLECTION_KEY);
+    const storageTransactionKey = `@gofinances:transactions_user:${user.id}`;
+    const response = await AsyncStorage.getItem(storageTransactionKey);
     const database: Transaction[] = response ? JSON.parse(response) : [];
 
     if(database.length === 0) {
@@ -130,7 +131,7 @@ export function Dashboard() {
         getLastTransactionDate(transactionsFiltered, 'outcome')
       );
     } catch(error) {
-      console.log(error);
+      
     }
 
     const transactionsFormatted: Transaction[] = transactionsFiltered.map(
@@ -162,8 +163,9 @@ export function Dashboard() {
   }
 
   async function handleClearDatabase() {
-    await AsyncStorage.removeItem('@gofinance:transaction');
-    await AsyncStorage.removeItem('@gofinance:user');
+    const storageTransactionKey = `@gofinances:transactions_user:${user.id}`;
+    await AsyncStorage.removeItem(storageTransactionKey);
+    await AsyncStorage.removeItem(`@gofinance:user:${user.id}`);
     loadTransactions();
   }
 
@@ -229,7 +231,11 @@ export function Dashboard() {
                   style: 'currency', currency: 'BRL'}
                 )
               }
-              lastTransaction={showData ? `Última entrada dia ${lastTransactionDepositDate}` : ''}
+              lastTransaction={
+                showData && summary.deposits 
+                ? `Última entrada dia ${lastTransactionDepositDate}` 
+                : 'Sem transações para o período'
+              }
             />
             <Card 
               type="outcome"
@@ -239,7 +245,9 @@ export function Dashboard() {
                   style: 'currency', currency: 'BRL'}
                 )
               }
-              lastTransaction={showData ? `Última saída dia ${lastTransactionWithdrawDate}` : ''}
+              lastTransaction={ showData && summary.deposits 
+              ? `Última saída dia ${lastTransactionDepositDate}` 
+              : 'Sem transações para o período'}
             />
             <Card 
               type="total"

@@ -23,8 +23,9 @@ import {
   LoadContainer,
 } from './styles'
 
-import { COLLECTION_KEY, CATEGORIES } from '../../global/constants'
+import { CATEGORIES } from '../../global/constants'
 import { Transaction } from "../../@types/entities/Transaction";
+import { useAuth } from "../../hooks/auth";
 
 interface ResumeItem {
   key: string;
@@ -48,9 +49,11 @@ interface Category {
 export function Resume() {
   const [isLoading, setIsLoading] = useState(true);
   const [showData, setShowData] = useState(false);
-  const [resume, setResume] = useState<ResumeItem[]>()
-  const [selectedDate, setSelectDate] = useState(new Date())
+  const [resume, setResume] = useState<ResumeItem[]>();
+  const [selectedDate, setSelectDate] = useState(new Date());
   const theme = useTheme();
+
+  const { user } = useAuth();
 
   function handleChangeDate(action: 'previous' | 'next') {
     if(action === 'previous') {
@@ -115,7 +118,8 @@ export function Resume() {
     setIsLoading(true);
 
     try {
-      const database = await AsyncStorage.getItem(COLLECTION_KEY);
+      const storageTransactionKey = `@gofinances:transactions_user:${user.id}`;
+      const database = await AsyncStorage.getItem(storageTransactionKey);
       const currentDatabase: Transaction[] = database ? JSON.parse(database) : [];
 
       let resumeData: ItemResume = {};

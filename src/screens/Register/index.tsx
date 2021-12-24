@@ -2,16 +2,20 @@ import React, { useState } from 'react';
 import { Modal, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import uuid from 'react-native-uuid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+
 import { useNavigation } from '@react-navigation/native'
+import { useAuth } from '../../hooks/auth';
+import { useForm } from 'react-hook-form';
 
 import { Button } from '../../components/Form/Button';
 import { CategorySelectButton } from '../../components/Form/CategorySelectButton';
 import { TransactionTypeButton } from '../../components/Form/TransactionTypeButton';
 import { CategorySelect } from '../CategorySelect';
 import { InputForm } from '../../components/Form/InputForm';
+
+import { Transaction } from '../../@types/entities/Transaction';
 
 import { 
   Container,
@@ -22,14 +26,10 @@ import {
   Title,
 } from './styles';
 
-import { Transaction } from '../../@types/entities/Transaction';
-
 interface FormData {
   name: string;
   amount: number;
 }
-
-import { COLLECTION_KEY } from '../../global/constants';
 
 const schema = yup.object({
   name: yup
@@ -52,6 +52,8 @@ export function Register() {
     key: 'category',
     name: 'Categoria'
   });
+
+  const { user } = useAuth();
 
   const { control, handleSubmit, reset, formState: { errors }  } = useForm({
     resolver: yupResolver(schema)
@@ -89,7 +91,8 @@ export function Register() {
     }
 
     try {
-      const database = await AsyncStorage.getItem(COLLECTION_KEY);
+      const storageTransactionKey = `@gofinances:transactions_user:${user.id}`;
+      const database = await AsyncStorage.getItem(storageTransactionKey);
       const currentDatabase: Transaction[] = database ? JSON.parse(database) : [];
       
       let transactions: Transaction[] = [];
@@ -103,7 +106,7 @@ export function Register() {
         transactions.push(newTransaction)
       )
 
-      await AsyncStorage.setItem(COLLECTION_KEY, JSON.stringify(transactions));
+      await AsyncStorage.setItem(storageTransactionKey, JSON.stringify(transactions));
 
       reset();
       setTransactionType('');

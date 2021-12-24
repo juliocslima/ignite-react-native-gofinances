@@ -22,6 +22,7 @@ interface User {
   email: string,
   name: string,
   photo?: string,
+  isLoggedIn: boolean,
 }
 
 interface AuthorizationResponse {
@@ -66,6 +67,7 @@ function AuthProvider({ children }: AuthProviderProps) {
           email: userInfo.email,
           name: userInfo.name,
           photo: userInfo.picture,
+          isLoggedIn: true,
         };
 
         setUser(userLogged);
@@ -79,6 +81,7 @@ function AuthProvider({ children }: AuthProviderProps) {
 
   async function signInWithApple() {
     try {
+
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
           AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
@@ -86,22 +89,44 @@ function AuthProvider({ children }: AuthProviderProps) {
         ]
       });
 
-      console.log(credential);
-
       if(credential) {
         const userLogged: User = {
           id: String(credential.user),
           email: credential.email!,
           name: credential.fullName!.givenName!,
           photo: undefined,
+          isLoggedIn: true,
         }
 
-        setUser(userLogged);
-        await AsyncStorage.setItem(userStorageKey, JSON.stringify(userLogged));
+        await loginUserToStorage(userLogged, true);
       }
 
     } catch(error) {
       throw new Error(error);
+    }
+  }
+
+  async function loginUserToStorage(user: User, isSignIn: boolean) {
+    const userStoraged = await AsyncStorage.getItem(userStorageKey);
+
+    if(userStoraged) {
+      const userLogged = JSON.parse(userStoraged) as User;
+
+      if(userLogged.id === user.id) {
+        if(isSignIn) {
+          userLogged.isLoggedIn = true;
+        } else {
+          userLogged.isLoggedIn = false;
+        }
+        
+
+        setUser(userLogged);
+        await AsyncStorage.setItem(userStorageKey, JSON.stringify(userLogged));
+      }
+    }
+    else {
+      await AsyncStorage.setItem(userStorageKey, JSON.stringify(user));
+      setUser(user);
     }
   }
 
@@ -123,8 +148,7 @@ function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function signOut() {
-    setUser({} as User);
-    await AsyncStorage.removeItem('@gofinance:user');
+    await loginUserToStorage(user, false);
   }
 
   useEffect(() => {
